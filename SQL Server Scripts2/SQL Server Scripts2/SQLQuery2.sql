@@ -88,15 +88,101 @@ CONSTRAINT [PK_GradeDetail] PRIMARY KEY CLUSTERED
 GO
 
 INSERT INTO [Student] ([FirstName], [LastName],[DateOfBirth])
-VALUES  ('Martin', 'Vitanov','1996-11-30')
+VALUES  ('John', 'Doe', '1999.09.09')
 INSERT INTO [Student] ([FirstName], [LastName],[DateOfBirth])
-VALUES  ('Martin', 'Vitanov','1996-11-30')
+VALUES  ('Jane', 'Doe', '1981.02.01')
 
-INSERT INTO [Teacher] ([FirstName], [LastName])
-VALUES  ('Juliana', 'Cvetkovska')
-INSERT INTO [Teacher] ([FirstName], [LastName])
-VALUES  ('Dejan', 'Jovanov')
+INSERT INTO [Teacher] ([FirstName], [LastName],[DateOfBirth])
+VALUES  ('John', 'Doe','1991.01.01')
+INSERT INTO [Teacher] ([FirstName], [LastName],[DateOfBirth])
+VALUES  ('John', 'Doe','1991.01.01')
 
+INSERT INTO [Course] ([Name], [Credit],[AcademicYear])
+VALUES  ('Math', '50','3')
+INSERT INTO [Course] ([Name], [Credit],[AcademicYear])
+VALUES  ('C-Language', '50','3')
+
+INSERT INTO [Grade] ([StudentID],[CourseID],[TeacherID],[Grade])
+VALUES  ('1', '1','1','8')
+INSERT INTO [Grade] ([StudentID],[CourseID],[TeacherID],[Grade])
+VALUES  ('2', '2','2','10')
+INSERT INTO [Grade] ([StudentID],[CourseID],[TeacherID],[Grade])
+VALUES  ('1', '3','2','5')
+
+INSERT INTO [AchivementType] ([Name],[Description],[ParticipationRate])
+VALUES  ('StudentOfTheYear', 'Student with most knowledge this year','101')
+INSERT INTO [AchivementType] ([Name],[Description],[ParticipationRate])
+VALUES  ('Winer', 'Winer','95')
+
+INSERT INTO [GradeDetail] ([GradeID],[AchivementTypeID],[AchivementPoints],[AchivementMaxPoints],[AchivementDate])
+VALUES  ('2', '1','101','101','2019-01-01')
+INSERT INTO [GradeDetail] ([GradeID],[AchivementTypeID],[AchivementPoints],[AchivementMaxPoints],[AchivementDate])
+VALUES  ('1', '2','95','100','2019-02-02')
+
+select count(Grade) as TotalGrades
+from dbo.Grade
+go
+
+select TeacherID,count(Grade) as TotalGrade
+from dbo.[Grade]
+group by TeacherID
+go
+
+select StudentID,count(Grade) as TotalGrade
+from dbo.[Grade]
+where StudentID < 100
+group by StudentID
+go
+
+select max(Grade) as MaxGrade,avg(Grade) as AverageGrade
+from dbo.Grade
+go
+
+select TeacherID,count(Grade) as TotalGrade
+from dbo.[Grade]
+group by TeacherID 
+having count(Grade) <= 200
+go
+
+select TeacherID,count(Grade) as TotalGrade
+from dbo.[Grade]
+where StudentID <= 100
+group by TeacherID
+having count(Grade) <= 50
+go
+
+select StudentID,count(Grade) as TotalGrade,max(Grade) as MaxGrade,avg(Grade) as AverageGrade 
+from dbo.[Grade]
+where StudentID < 100
+group by StudentID
+having max(Grade) = avg(Grade)
+go
+
+select s.FirstName,s.LastName,count(Grade) as TotalGrade,max(Grade) as MaxGrade,avg(Grade) as AverageGrade 
+from dbo.[Grade] g
+inner join dbo.Student s on s.Id = g.StudentID
+where StudentID < 100
+Group by s.FirstName,s.LastName
+having max(Grade) = avg(Grade)
+go
+
+drop view if exists vv_Students
+
+create view vv_Students
+as
+select StudentID,count(Grade) as TotalGrade
+from dbo.[Grade]
+where StudentID < 100
+group by StudentID
+go
+
+alter view vv_Students
+as
+select s.FirstName,s.LastName
+from dbo.[Grade] g
+inner join dbo.Student s on s.Id = g.StudentID
+Group by s.FirstName,s.LastName
+go
 
 
 SELECT * FROM FINKI.dbo.Student
